@@ -1,20 +1,23 @@
 <html>
     <head>
-        <style>
-            #animatedGIF-0{
-                width: 300;
-                height: 300;
-            }
-        </style>
+        <link rel="stylesheet" href="general.css">
+        <link rel="stylesheet" href="progLine.css">
     </head>
+
 <body>
     <h3>Animated gif preview</h3>
-    <button onclick="snap()">Snapshot</button>
-    <button onclick="createGIF()">Create GIF</button>
+    <div>
+        <button onclick="snap()">Snapshot</button>
+        <button onclick="createGIF()" id="create-gif">Create GIF</button>
 
-    <div id="preview">
-        <table id="pTable"></table>
+        <!-- <button onclick="togglePBar()">Toggle bar!</button> -->
+        <progress max="1" value="0" class="progress hidden"></progress>
+
+        <div id="preview">
+            <table id="pTable"></table>
+        </div>
     </div>
+
 
     <script src="script.js"></script>
     <script src='gifshot.js'></script>
