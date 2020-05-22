@@ -1,66 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback  } from 'react';
 import { Button, Icon, Grid } from 'semantic-ui-react';
 
-// util
-function useUserMedia(requestedMedia) {
-  const [mediaStream, setMediaStream] = useState(null);
-
-  useEffect(() => {
-    async function enableStream() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(requestedMedia);
-
-        setMediaStream(stream);
-      } catch (err) {
-        // handle
-      }
-    }
-
-    if (!mediaStream) {
-      enableStream();
-    } else {
-      return function cleanup() {
-        mediaStream.getTracks().forEach(track => {
-          track.stop();
-        });
-      }
-    }
-  }, [mediaStream, requestedMedia]);
-  return mediaStream;
-}
-
-function useEventListener(eventName, handler, element = window) {
-  const savedHandler = useRef();
-
-  useEffect(() => {
-    savedHandler.current = handler;
-  }, [handler]);
-
-  useEffect(
-    () => {
-
-      const isSupported = element && element.addEventListener;
-      if (!isSupported) return;
-
-      const eventListener = event => savedHandler.current(event);
-
-      element.addEventListener(eventName, eventListener);
-
-      return function cleanup() {
-        element.removeEventListener(eventName, eventListener);
-      }
-
-    }, 
-    [eventName, element] // only rerun if eventName or element changes
-  );
-};
-
-// -----------------------------------------------------------------
+import { useUserMedia, useEventListener} from '../util/general';
+/*TODO
+* 
+*/
 
 // component
 
 const Camera = () => {
 
+  const [isRecorded, setIsRecorded] = useState(false);
   const CAPTURE_OPTIONS = {
     audio: false,
     video: {
@@ -86,9 +36,6 @@ const Camera = () => {
       console.log(e.target.id + ' was clicked')
 
       recordStream(previewRef, 6000);
-
-
-      //if (blob && recordedRef.current && !recordedRef.current.srcObject) { }
 
 
       function wait (delayInMs) {
@@ -121,41 +68,37 @@ const Camera = () => {
           const blob = new Blob(data, { 'type' : 'video/mp4'});
           console.log(blob)
           recordedRef.current.src = URL.createObjectURL(blob);
+          setTimeout(setIsRecorded(true), 20);
           });
       }
-
-      
     }
   }, [])
 
-  const stopRecording = useCallback(e => {
-    if (e.target.id === 'stop') {
-      console.log(e.target.id + ' was clicked')
-
-      
-    }
-  }, [])
-
-  // <video ref={recordedRef} onCanPlay={handleCanPlayRec} autoPlay playsInline muted />
 
   useEventListener('click', startRecording);
-  useEventListener('click', stopRecording);
-
+  
   return (
     <Grid >
       <Grid.Row>
-      <video ref={previewRef} onCanPlay={handleCanPlay} autoPlay playsInline muted />
-      <video ref={recordedRef} controls/>
+      <video 
+        ref={previewRef}
+        onCanPlay={handleCanPlay}
+        autoPlay
+        playsInline
+        muted
+        hidden={isRecorded}/>
+      <video
+        ref={recordedRef}
+        controls
+        width='300'
+        height='300'
+        hidden={!isRecorded}/>
       </Grid.Row>
       <Grid.Row>
         <Button id='start' icon labelPosition='left'>
         <Icon name='play' />
         Start
         </Button>
-        <Button id='stop' icon labelPosition='right'>
-        <Icon name='stop' />
-        Stop
-      </Button>
       </Grid.Row>
     </Grid>
 

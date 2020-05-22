@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Image, Container, Input, Modal, Header } from 'semantic-ui-react';
+import { Menu, Image, Container, Input, Modal } from 'semantic-ui-react';
 
 const Nav = () => {
   const [activeItem, setActiveItem] = useState('home')

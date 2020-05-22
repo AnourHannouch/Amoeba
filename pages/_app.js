@@ -9,7 +9,7 @@ function SignLang({ Component, pageProps }) {
     <>
       <Head>
         <title>SignLang</title>
-        <link rel='icon' href='/favicon.png' />
+        <link rel='icon' href='/favicon.PNG' />
       </Head>
       {/* needs floating menu */}
       <Nav />
