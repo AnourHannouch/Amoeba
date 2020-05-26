@@ -55,7 +55,7 @@ const Camera = () => {
           mediaRecorder.onstop = resolve;
           mediaRecorder.onerror = e => reject (e.name);
         });
-    
+
         const recorded = wait(lengthInMs).then(
           () => mediaRecorder.state === 'recording' && mediaRecorder.stop()
         );
@@ -76,7 +76,11 @@ const Camera = () => {
 
 
   useEventListener('click', startRecording);
-  
+
+  function clickEventHandler() {
+    
+  }
+
   return (
     <Grid >
       <Grid.Row>

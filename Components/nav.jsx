@@ -20,12 +20,12 @@ const Nav = () => {
         
 
       <Menu.Menu position='right'>
-        <Modal trigger={<Menu.Item name='add' icon='plus'/>}>
+      <Modal trigger={<Menu.Item name='add' icon='plus'/>}>
           <Modal.Header>
             Add a Word
           </Modal.Header>
 
-        </Modal>
+        </Modal>  
         
         <Menu.Item
           name='Language'
