@@ -3,14 +3,17 @@ import { Button, Icon, Grid } from 'semantic-ui-react';
 
 import { useUserMedia, useEventListener} from '../util/general';
 /*TODO
-* 
+* Component needs to be updated to use useEffect for mounting/dismounting 
+* preview / recorded. 
 */
 
 // component
-
 const Camera = () => {
-
+  // state to check if clip has been recorded
   const [isRecorded, setIsRecorded] = useState(false);
+  const [fileUrl, setFileUrl] = useState(null);
+
+  // video constraints
   const CAPTURE_OPTIONS = {
     audio: false,
     video: {
@@ -20,24 +23,29 @@ const Camera = () => {
   }
 
   const previewRef = useRef(); // reference to preview Video
-  const recordedRef = useRef(); // 
-  const mediaStream = useUserMedia(CAPTURE_OPTIONS);
+  const recordedRef = useRef(); // reference to recorded video
+  const mediaStream = useUserMedia(CAPTURE_OPTIONS); // start media stream with constraints
 
+  // if the capture is started, the videoRef exists and it does not have a source, add source from stream
   if (mediaStream && previewRef.current && !previewRef.current.srcObject) {
     previewRef.current.srcObject = mediaStream;
   }
 
+  // when stream is ready to play, play
   function handleCanPlay() {
     previewRef.current.play();
   }
   
+  // when eventListener is triggered by a click and the target is start button, start recording
   const startRecording = useCallback(e => {
-    if (e.target.id === 'start') {
-      console.log(e.target.id + ' was clicked')
-
-      recordStream(previewRef, 6000);
-
-
+    console.log(e.target.id + ' was clicked');
+      
+      try {
+        recordStream(previewRef, 6000);
+      } catch (err) {
+        console.log(err);
+      }
+      
       function wait (delayInMs) {
         return new Promise(resolve => setTimeout(resolve, delayInMs));
       }
@@ -48,7 +56,12 @@ const Camera = () => {
         let data = [];
     
         mediaRecorder.ondataavailable = e => data.push(e.data);
-        mediaRecorder.start();
+        try {
+          mediaRecorder.start();
+        } catch (err) {
+          console.log(err)
+        }
+        
         console.log(mediaRecorder.state + ' for ' + (lengthInMs/1000) + ' seconds...');
     
         const stopped = new Promise ((resolve, reject) => {
@@ -67,17 +80,39 @@ const Camera = () => {
         .then(() => {
           const blob = new Blob(data, { 'type' : 'video/mp4'});
           console.log(blob)
-          recordedRef.current.src = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
+          recordedRef.current.src = url;
+          setFileUrl(url);
           setTimeout(setIsRecorded(true), 20);
           });
       }
-    }
   }, [])
 
+  const downloadBlob = () => {
+    const url = fileUrl;
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = url + '.mp4';
+    a.click();
+  }
 
-  useEventListener('click', startRecording);
 
-  function clickEventHandler() {
+  useEventListener('click', clickEventHandler);
+
+  function clickEventHandler(e) {
+    switch (e.target.id) {
+      case 'start':
+        if (isRecorded) {
+          setIsRecorded(false);
+          previewRef.current.srcObject = mediaStream;
+          setTimeout(20);
+        } 
+        startRecording(e);
+        break;
+      
+      default:
+        return;
+    }
     
   }
 
@@ -102,6 +137,10 @@ const Camera = () => {
         <Button id='start' icon labelPosition='left'>
         <Icon name='play' />
         Start
+        </Button>
+        <Button id='download' icon labelPosition='right' onClick={downloadBlob}>
+          <Icon name='download' />
+          Download
         </Button>
       </Grid.Row>
     </Grid>
