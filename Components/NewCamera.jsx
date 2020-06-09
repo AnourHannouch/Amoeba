@@ -3,49 +3,49 @@ import { Button, Icon, Grid } from 'semantic-ui-react';
 
 import { useUserMedia, useEventListener} from '../util/general';
 
-const CameraContext = React.createContext();
-function useCameraContext() {
-  const context = useContext(CameraContext);
-
-  if (!context) {
-    throw new Error(
-      'Camera compound components cannot be rendered outside Camera component.'
-    )
-  }
-
-  return context;
-}
 
 const Camera = () => {
   //has been recorded? fileUrl to recording
   const [isRecorded, setIsRecorded] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
+  const videoRef = useRef(); // reference to Video Feed
 
-  
+  useEffect(() => {
+    !isRecorded
+    ? videoRef = handleFeed(videoRef)
+    : videoRef = handleRecording()
 
-  // video constraints
-  const CAPTURE_OPTIONS = {
-    audio: false,
-    video: {
-      width : { ideal: 300 },
-      height: { ideal: 300 }
-    }
+  }, [isRecorded]);
+
+  function handleFeed(ref) {
+
+      //feed constaints
+      const CAPTURE_OPTIONS = {
+        audio: false,
+        video: {
+          width : { ideal: 300 },
+          height: { ideal: 300 }
+        }
+      }
+      // start media stream with constraints
+      const mediaStream = useUserMedia(CAPTURE_OPTIONS);
+
   }
+
   return (
-    <CameraContext.Provider value={value}>
-      <
-    </CameraContext.Provider>
+    <>
+      <Video ref={videoRef}/>
+    </>
   )
 
 }
 
-  // Camera.Feed for live capture
-  function Feed () {
+function Video (props) {
+  return (
+    <>
+      <video ref={props.videoRef}/>
+    </>
+  )
+}
 
-  }
-
-  // Camera.Preview for recorded video
-  function Preview () {
-
-  }
-
+export default Camera;

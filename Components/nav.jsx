@@ -8,7 +8,7 @@ const Nav = () => {
 
   return (
     <Menu>
-        <Image src='/favicon.png' size='tiny' />
+      <Image src='/favicon.png' size='tiny' />
       <Menu.Item 
         name='Dictionary'
         active={activeItem === 'dictionary'}
